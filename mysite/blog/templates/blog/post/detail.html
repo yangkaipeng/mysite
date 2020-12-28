@@ -6,4 +6,38 @@
     Published {{ post.publish }} by {{ post.author }}
   </p>
   {{ post.body|linebreaks }}
+  <p>
+    <a href="{% url "blog:post_share" post.id %}">
+      分享此博客
+    </a>
+  </p>
+  {% with comments.count as total_comments %}
+    <h2>
+      {{ total_comments }} comment{{ total_comments|pluralize }}
+    </h2>
+  {% endwith %}
+
+  {% for comment in comments %}
+    <div class="comment">
+      <p class="info">
+        Comment {{ forloop.counter }} by {{ comment.name }}
+        {{ comment.created }}
+      </p>
+      {{ comment.body|linebreaks }}
+    </div>
+  {% empty %}
+    <p>暂时无评论</p>
+  {% endfor %}
+
+  {% if new_comment %}
+    <h2>你发表的评论已被保存。</h2>
+  {% else %}
+    <h2>评论区</h2>
+    <form action="." method="post">
+      {{ comment_form.as_p }}
+      {% csrf_token %}
+      <p><input type="submit" value="添加新评论"></p>
+    </form>
+  {% endif %}
+
 {% endblock %}
