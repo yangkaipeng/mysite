@@ -4,9 +4,17 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
 from django.conf import settings
+from taggit.models import Tag
+from django.db.models import Count
 
-def post_list(request):
+
+def post_list(request, tag_slug=None):
     object_list = Post.objects.all()
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        print('标签是',tag)
+        object_list = object_list.filter(tags__in=[tag])
     paginator = Paginator(object_list,2)   # 每两篇文章分一页
     page = request.GET.get('page')  # 指明页数
     try:
@@ -17,7 +25,7 @@ def post_list(request):
     except EmptyPage:
         # 如果超出了最大页数，就显示最后一页
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blog/post/list.html',{'page':page,'posts':posts})
+    return render(request, 'blog/post/list.html',{'page':page,'posts':posts,'tag':tag})
 
 def post_detail(request,year,month,day,post):
     post = get_object_or_404(Post, slug=post,
@@ -37,10 +45,17 @@ def post_detail(request,year,month,day,post):
             new_comment.save()
     else:
         comment_form = CommentForm()
+    # 列出类似的文章
+    post_tags_ids = post.tags.values_list('id', flat=True)   # 找出所有的tag id
+    similar_posts = Post.objects.filter(tags__in=post_tags_ids)\
+                                .exclude(id=post.id)         # 列出除了自身外的所有同标签文章
+    similar_posts = similar_posts.annotate(same_tags=Count('tags'))\
+                                .order_by('-same_tags','-publish')[:4]
     return render(request, 'blog/post/detail.html',{'post':post,
                                                     'comments':comments,
                                                     'new_comment':new_comment,
-                                                    'comment_form':comment_form})
+                                                    'comment_form':comment_form,
+                                                    'similar_posts':similar_posts})
 
 def post_share(request, post_id):
     post = get_object_or_404(Post, id=post_id, status = 'published')

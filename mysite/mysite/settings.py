@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',      # 一个消息框架
     'django.contrib.staticfiles',    # 一个管理静态文件的框架
     'blog',
+    'taggit',
 ]
 
 MIDDLEWARE = [
