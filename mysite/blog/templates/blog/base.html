@@ -1,3 +1,4 @@
+{% load blog_tags %}
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -12,7 +13,19 @@
   </div>
   <div id="sidebar">
     <h2>KP的博客</h2>
-      <p>这是我的博客</p>
+      <p>这是我的博客。我已经写了{% total_posts %}篇文章。</p>
+    <h3>最新文章</h3>
+  {% show_latest_posts 3 %}
+  <h3>评论最多的文章</h3>
+  {% get_most_commented_posts 2 as most_commented_posts %}
+  <ul>
+    {% for post in most_commented_posts %}
+    <li>
+      <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+    </li>
+  {% endfor %}
+  </ul>
   </div>
+
 </body>
 </html>

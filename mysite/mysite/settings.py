@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'edj-&xbu12)s^yd7-2ve@h5lgw6_hlg%)ef*s%%(8o@oyb1d%m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['123.57.151.114',]
 
 
 # Application definition
@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',    # 一个管理静态文件的框架
     'blog',
     'taggit',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +129,27 @@ EMAIL_HOST_USER = 'yangkaipeng2012@163.com'
 EMAIL_HOST_PASSWORD = 'MEFXTUIRRELCSOAP'
 EMAIL_PORT = 25
 EMAIL_USE_TLS = True
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
+
+
